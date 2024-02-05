@@ -1,19 +1,67 @@
 #![deny(clippy::all)]
-use std::cell::Cell;
+
+trait CanRun {
+    fn run(&self);
+}
+trait CanWalk {
+    fn walk(&self);
+}
+impl<T: CanRun> CanRun for Vec<T> {
+    fn run(&self) {
+        for item in self {
+            item.run();
+        }
+    }
+}
+impl<T: CanWalk> CanWalk for Vec<T> {
+    fn walk(&self) {
+        for item in self {
+            item.walk();
+        }
+    }
+}
+
 struct Person {
     name: String,
-    age: Cell<u8>,
 }
-impl Person {
-    fn increment_age(&self) {
-        self.age.set(self.age.get() + 1);
+impl CanRun for Person {
+    fn run(&self) {
+        println!("{} is running", self.name);
+    }
+}
+impl CanWalk for Person {
+    fn walk(&self) {
+        println!("{} is walking", self.name);
+    }
+}
+
+struct Elephant {
+    name: String,
+}
+
+impl CanWalk for Elephant {
+    fn walk(&self) {
+        println!("Elephant {} is walking", self.name)
     }
 }
 fn main() {
-    let person = Person {
-        name: "John".to_string(),
-        age: Cell::new(12),
-    };
-    person.increment_age();
-    println!("{}", person.age.get())
+    let people = vec![
+        Person {
+            name: "John".to_string(),
+        },
+        Person {
+            name: "Mary".to_string(),
+        },
+    ];
+    people.run();
+    people.walk();
+    let elephants = vec![
+        Elephant {
+            name: "John".to_string(),
+        },
+        Elephant {
+            name: "Mary".to_string(),
+        },
+    ];
+    elephants.walk();
 }
